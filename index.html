@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAME SHOP • PS4 Exploit Gateway & Smart Router</title>
+  <link rel="icon" type="image/png" href="icon0.png">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Immediate Auto-Detection Script (Executes before any cache asset download) -->
+  <script>
+    (function () {
+      try {
+        var search = window.location.search || "";
+        var params = new URLSearchParams(search);
+
+        // Allow manual UI view with ?manual=1, ?select=1, ?stay=1 or ?noredirect=1
+        if (params.get("manual") === "1" || params.get("select") === "1" || params.get("stay") === "1" || params.get("noredirect") === "1") {
+          window.__GS_MANUAL_OVERRIDE = true;
+          return;
+        }
+
+        var ua = navigator.userAgent;
+        var m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(ua);
+        if (m) {
+          var major = parseInt(m[1], 10);
+          var minor = parseInt(m[2], 16);
+          var ms = minor.toString(16);
+          if (ms.length < 2) ms = "0" + ms;
+          var fwNum = major * 100 + parseInt(ms, 10);
+
+          // Target 1: FW 13.02 - 13.52 -> Switch to local 13.52 host (loads & caches offline assets)
+          if (fwNum >= 1302 && fwNum <= 1352) {
+            window.location.replace("host1352.html" + search);
+            return;
+          }
+
+          // Target 2: FW 7.00 - 13.00 -> Switch to Game Shop AIO host
+          if (fwNum < 1302) {
+            window.location.replace("https://letsplay-ps.github.io/aio/" + search);
+            return;
+          }
+        }
+      } catch (err) {}
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="main-wrapper">
+    <!-- Header -->
+    <header class="header-card">
+      <h1 class="brand-title">GAME SHOP</h1>
+      <p class="brand-subtitle">Smart Exploit Gateway • Automated PS4 Firmware Dispatcher</p>
+      
+      <div class="badges-row">
+        <span class="badge badge-primary" id="systemBadge">🔍 Analyzing System...</span>
+        <span class="badge badge-info" id="routingBadge">⚡ Smart Routing</span>
+        <span class="badge badge-success">🛡️ Zero Cache Overhead</span>
+        <span class="badge badge-secondary">👑 Dual Host Ready</span>
+      </div>
+    </header>
+
+    <!-- Centerpiece Animated Game Shop Banner -->
+    <div class="banner-stage">
+      <img src="gameshop_animated.gif" alt="GAME SHOP PS4 Exploit Banner" class="banner-animated-img" id="bannerGraphic">
+    </div>
+
+    <!-- Gateway Hub Content -->
+    <div class="gateway-wrapper">
+      <!-- Live Status & Auto-Routing Banner -->
+      <div class="gateway-banner" id="statusBanner">
+        <div class="gateway-banner-text">
+          <span id="bannerIcon">🎮</span>
+          <span id="bannerMessage">Detecting your console firmware version...</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="gateway-banner-badge" id="detectedFwBadge">PS4 FW --.--</span>
+          <button class="gateway-cancel-btn" id="cancelRedirectBtn" style="display:none;" onclick="cancelRedirect()">
+            ✖ Cancel Auto-Redirect
+          </button>
+        </div>
+      </div>
+
+      <!-- Two Host Selection Cards -->
+      <div class="gateway-grid">
+        <!-- Card 1: PS4 13.52 Local Host -->
+        <div class="gateway-card card-local">
+          <div>
+            <div class="gateway-card-header">
+              <span class="gateway-card-icon">🚀</span>
+              <span class="gateway-tag tag-cyan">100% Offline Ready</span>
+            </div>
+            <h2 class="gateway-card-title">PS4 FW 13.52</h2>
+            <p class="gateway-card-desc">
+              Dedicated high-performance exploit host for modern PS4 firmwares (13.02 - 13.52). Features Poops / RTHDR kernel exploit and offline GoldHEN injection.
+            </p>
+            <ul class="gateway-features-list">
+              <li><span class="dot dot-cyan"></span> Built-in Full Offline ApplicationCache</li>
+              <li><span class="dot dot-cyan"></span> Poops / RTHDR Kernel Race Engine</li>
+              <li><span class="dot dot-cyan"></span> High-Performance Exploit Pipeline</li>
+              <li><span class="dot dot-cyan"></span> Instant GoldHEN v2 Payload Loader</li>
+            </ul>
+          </div>
+          <a href="host1352.html" class="gateway-btn gateway-btn-cyan" id="btnLocal">
+            <span>⚡ Open 13.52 Host</span>
+            <span>➔</span>
+          </a>
+        </div>
+
+        <!-- Card 2: PS4 7.00 - 13.00 External AIO Host -->
+        <div class="gateway-card card-external">
+          <div>
+            <div class="gateway-card-header">
+              <span class="gateway-card-icon">🌐</span>
+              <span class="gateway-tag tag-purple">Multi-Firmware</span>
+            </div>
+            <h2 class="gateway-card-title">PS4 FW 7.00 – 13.00</h2>
+            <p class="gateway-card-desc">
+              Official Game Shop All-in-One exploit suite covering firmware 7.00 up to 13.00. Supports 9.00, 11.00, PPPwn, WebKit, and essential payloads.
+            </p>
+            <ul class="gateway-features-list">
+              <li><span class="dot dot-purple"></span> Multi-Firmware Auto & Manual Selectors</li>
+              <li><span class="dot dot-purple"></span> GoldHEN for FW 7.00 – 11.00</li>
+              <li><span class="dot dot-purple"></span> PPPwn & WebKit Exploit Support</li>
+              <li><span class="dot dot-purple"></span> Cloud Updated Suite</li>
+            </ul>
+          </div>
+          <a href="https://letsplay-ps.github.io/aio/" class="gateway-btn gateway-btn-purple" id="btnExternal">
+            <span>🌐 Open Game Shop AIO</span>
+            <span>➔</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div><strong>GAME SHOP HOST</strong> • Developed & Maintained by Ahmed Elattar</div>
+    </footer>
+  </div>
+
+  <script>
+    let countdownTimer = null;
+    let secondsLeft = 3;
+    let targetRedirectUrl = null;
+
+    function cancelRedirect() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      const cancelBtn = document.getElementById("cancelRedirectBtn");
+      if (cancelBtn) cancelBtn.style.display = "none";
+      const bannerMsg = document.getElementById("bannerMessage");
+      if (bannerMsg) bannerMsg.textContent = "Auto-redirect paused. Select your target host below.";
+    }
+
+    function startAutoRedirect(targetUrl, hostName) {
+      targetRedirectUrl = targetUrl;
+      const cancelBtn = document.getElementById("cancelRedirectBtn");
+      if (cancelBtn) cancelBtn.style.display = "inline-block";
+
+      const bannerMsg = document.getElementById("bannerMessage");
+      if (bannerMsg) {
+        bannerMsg.textContent = `Routing to ${hostName} in ${secondsLeft}s...`;
+      }
+
+      countdownTimer = setInterval(() => {
+        secondsLeft--;
+        if (bannerMsg) {
+          bannerMsg.textContent = `Routing to ${hostName} in ${secondsLeft}s...`;
+        }
+        if (secondsLeft <= 0) {
+          clearInterval(countdownTimer);
+          window.location.replace(targetRedirectUrl + window.location.search);
+        }
+      }, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const ua = navigator.userAgent;
+      const systemBadge = document.getElementById("systemBadge");
+      const detectedFwBadge = document.getElementById("detectedFwBadge");
+      const bannerMessage = document.getElementById("bannerMessage");
+      const bannerIcon = document.getElementById("bannerIcon");
+      const routingBadge = document.getElementById("routingBadge");
+
+      const m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(ua);
+
+      if (m) {
+        const major = parseInt(m[1], 10);
+        const minor = parseInt(m[2], 16);
+        let ms = minor.toString(16);
+        if (ms.length < 2) ms = "0" + ms;
+        const fwKey = major + "." + ms;
+        const fwNum = major * 100 + parseInt(ms, 10);
+
+        systemBadge.textContent = `🎮 PS4 FW ${fwKey}`;
+        detectedFwBadge.textContent = `PS4 FW ${fwKey}`;
+
+        if (fwNum >= 1302 && fwNum <= 1352) {
+          detectedFwBadge.style.color = "#ff5500";
+          detectedFwBadge.style.borderColor = "#ff5500";
+          routingBadge.textContent = "⚡ Target: Local 13.52";
+          bannerIcon.textContent = "🚀";
+          if (!window.__GS_MANUAL_OVERRIDE) {
+            startAutoRedirect("host1352.html", "13.52 Local Host");
+          } else {
+            bannerMessage.textContent = `Detected PS4 FW ${fwKey}. Select target host below:`;
+          }
+        } else if (fwNum < 1302) {
+          detectedFwBadge.style.color = "#fbbf24";
+          detectedFwBadge.style.borderColor = "#fbbf24";
+          routingBadge.textContent = "🌐 Target: Game Shop AIO";
+          bannerIcon.textContent = "🌐";
+          if (!window.__GS_MANUAL_OVERRIDE) {
+            startAutoRedirect("https://letsplay-ps.github.io/aio/", "Game Shop AIO (7.00 - 13.00)");
+          } else {
+            bannerMessage.textContent = `Detected PS4 FW ${fwKey}. Select target host below:`;
+          }
+        } else {
+          detectedFwBadge.textContent = `FW ${fwKey} (Untested)`;
+          routingBadge.textContent = "⚠️ Untested FW";
+          bannerMessage.textContent = `Console FW ${fwKey} is higher than 13.52. Please select manually:`;
+        }
+      } else {
+        systemBadge.textContent = "💻 PC / Testing Mode";
+        detectedFwBadge.textContent = "PC Browser";
+        bannerIcon.textContent = "💻";
+        bannerMessage.textContent = "Operating in PC simulation mode. Choose your target host:";
+        routingBadge.textContent = "⚙️ Manual Mode";
+      }
+    });
+  </script>
+</body>
+</html>
