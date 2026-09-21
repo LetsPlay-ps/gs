@@ -37,7 +37,7 @@
 
           // Target 2: FW 7.00 - 13.00 -> Switch to Game Shop AIO host
           if (fwNum < 1302) {
-            window.location.replace("https://letsplay-ps.github.io/aio/" + search);
+            window.location.replace("https://letsplay-ps.github.io/gs1/" + search);
             return;
           }
         }
@@ -126,7 +126,7 @@
               <li><span class="dot dot-purple"></span> Cloud Updated Suite</li>
             </ul>
           </div>
-          <a href="https://letsplay-ps.github.io/aio/" class="gateway-btn gateway-btn-purple" id="btnExternal">
+          <a href="https://letsplay-ps.github.io/gs1/" class="gateway-btn gateway-btn-purple" id="btnExternal">
             <span>🌐 Open Game Shop AIO</span>
             <span>➔</span>
           </a>
@@ -215,7 +215,7 @@
           routingBadge.textContent = "🌐 Target: Game Shop AIO";
           bannerIcon.textContent = "🌐";
           if (!window.__GS_MANUAL_OVERRIDE) {
-            startAutoRedirect("https://letsplay-ps.github.io/aio/", "Game Shop AIO (7.00 - 13.00)");
+            startAutoRedirect("https://letsplay-ps.github.io/gs1/", "Game Shop AIO (7.00 - 13.00)");
           } else {
             bannerMessage.textContent = `Detected PS4 FW ${fwKey}. Select target host below:`;
           }
