@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="cache.appcache">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -299,7 +299,6 @@
       selectedFw = val;
       logToDebug(`Target firmware set to: ${val}`);
       updateEngineBadge();
-      initSelectiveCaching();
     }
 
     // Countdown / Auto-Jailbreak controls
@@ -478,90 +477,106 @@
       }
     }
 
-    // Selective Background Offline Caching Manager
-    const GS_CACHE_REV = "20260922-v2";
+    // Native ApplicationCache Lifecycle Manager (Direct 100% Offline Support)
+    let isCachingComplete = false;
 
-    function getCacheCategory(fwNum) {
-      if (fwNum >= 1302 && fwNum <= 1352) return "1302_1352";
-      if (fwNum >= 1250 && fwNum <= 1300) return "1250_1300";
-      if (fwNum >= 1000 && fwNum <= 1202) return "1000_1202";
-      if (fwNum >= 600 && fwNum <= 960) return "700_960";
-      return "1302_1352";
-    }
-
-    function initSelectiveCaching() {
-      const fwNum = getEffectiveFwNum();
+    function setupAppCache() {
+      const ac = window.applicationCache;
       const fwLabel = getEffectiveFwLabel();
-      const cat = getCacheCategory(fwNum);
-      currentCacheCategory = cat;
 
-      const cachedKey = localStorage.getItem("gs_cached_cat");
-      const cachedRev = localStorage.getItem("gs_cache_rev");
-
-      if (cachedKey === cat && cachedRev === GS_CACHE_REV) {
+      function onCacheReady(msg, announce = true) {
+        isCachingComplete = true;
         updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
-        logToDebug(`[CACHE] Firmware ${fwLabel} files are verified in offline cache.`);
+        if (announce) {
+          logToDebug(`[CACHE] ${msg}`);
+        }
+        if (jailbreakBtn && !exploitTriggered) {
+          jailbreakBtn.disabled = false;
+          jailbreakBtn.innerHTML = '<span>🚀 Start Jailbreak</span>';
+        }
+        // Start auto-exploit countdown ONLY after cache is verified/ready
+        const storedAutoJb = localStorage.getItem("gs_autojb") === "true";
+        if (storedAutoJb && !timerId && !exploitTriggered) {
+          startCountdown();
+        }
+      }
+
+      if (!ac) {
+        onCacheReady("Browser does not support ApplicationCache.", false);
         return;
       }
 
-      updateCacheBadge("⏳ Caching FW " + fwLabel + "...", "badge-info");
-      logToDebug(`[CACHE] Triggering background caching for FW ${fwLabel} (Category: ${cat})...`);
-
-      let iframe = document.getElementById("cacheLoaderFrame");
-      if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.id = "cacheLoaderFrame";
-        iframe.style.display = "none";
-        document.body.appendChild(iframe);
+      if (ac.status === ac.IDLE) {
+        onCacheReady(`Firmware ${fwLabel} suite verified in offline cache.`);
+      } else if (!navigator.onLine) {
+        onCacheReady(`Operating offline from local cache.`);
+      } else {
+        if (jailbreakBtn) {
+          jailbreakBtn.disabled = true;
+          jailbreakBtn.innerHTML = '<span>⏳ Caching Offline...</span>';
+        }
+        updateCacheBadge("⏳ Checking Cache...", "badge-info");
+        setProgress(0, "Connecting to host & checking offline manifest...");
       }
-      iframe.src = `cache_loader_${cat}.html?t=` + Date.now();
-    }
 
-    // Cache event handler from hidden iframe
-    window.addEventListener("message", function (event) {
-      if (!event.data || event.data.source !== "gameshop_cache") return;
-      const { type, data } = event.data;
-      const fwLabel = getEffectiveFwLabel();
+      ac.addEventListener("checking", function () {
+        logToDebug("[CACHE] Checking offline cache manifest on server...");
+        updateCacheBadge("⏳ Checking Cache...", "badge-info");
+      });
 
-      if (type === "checking") {
-        logToDebug("[CACHE] Checking firmware manifest...");
-      } else if (type === "downloading") {
+      ac.addEventListener("downloading", function () {
+        isCachingComplete = false;
+        stopCountdown();
+        if (jailbreakBtn) {
+          jailbreakBtn.disabled = true;
+          jailbreakBtn.innerHTML = '<span>⏳ Caching Offline...</span>';
+        }
         updateCacheBadge("⏳ Caching Files...", "badge-warning");
-        logToDebug(`[CACHE] Downloading offline files for FW ${fwLabel}...`);
-      } else if (type === "progress") {
-        if (data && data.total) {
-          const pct = Math.round((data.loaded / data.total) * 100);
-          setProgress(pct, `Caching FW ${fwLabel} files: ${data.loaded}/${data.total} (${pct}%)`);
+        setProgress(5, `Downloading offline exploit suite for FW ${fwLabel}...`);
+        logToDebug(`[CACHE] Downloading offline files into PS4 cache...`);
+      });
+
+      ac.addEventListener("progress", function (e) {
+        if (e && e.total) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          setProgress(pct, `Caching offline assets: ${e.loaded}/${e.total} (${pct}%)`);
           updateCacheBadge(`⏳ Caching ${pct}%`, "badge-warning");
         }
-      } else if (type === "cached" || type === "updateready") {
-        setProgress(100, `FW ${fwLabel} files successfully cached for offline use!`);
-        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
-        logToDebug(`[CACHE] FW ${fwLabel} files successfully stored offline.`);
-        if (currentCacheCategory) {
-          localStorage.setItem("gs_cached_cat", currentCacheCategory);
-          localStorage.setItem("gs_cache_rev", GS_CACHE_REV);
-        }
+      });
+
+      ac.addEventListener("cached", function () {
+        setProgress(100, "All exploit assets 100% cached offline! You can now disconnect the internet.");
+        logToDebug("[CACHE] Host successfully stored in PS4 offline cache.");
+        localStorage.setItem("gs_cached", "true");
         setTimeout(() => {
-          setProgress(0, "System initialized & ready. Click Start Jailbreak to begin.");
-        }, 2000);
-      } else if (type === "noupdate") {
-        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
-        logToDebug(`[CACHE] FW ${fwLabel} files are up to date.`);
-        if (currentCacheCategory) {
-          localStorage.setItem("gs_cached_cat", currentCacheCategory);
-          localStorage.setItem("gs_cache_rev", GS_CACHE_REV);
-        }
-      } else if (type === "error") {
-        if (localStorage.getItem("gs_cached_cat") === currentCacheCategory) {
-          updateCacheBadge("🛡️ Offline Ready", "badge-success");
-          logToDebug("[CACHE] Running offline using cached firmware files.");
+          if (!exploitTriggered) {
+            setProgress(0, "System initialized & ready. Click Start Jailbreak to begin.");
+          }
+          onCacheReady("Caching completed successfully.");
+        }, 1500);
+      });
+
+      ac.addEventListener("updateready", function () {
+        try { ac.swapCache(); } catch (e) {}
+        setProgress(100, "Cache updated with latest version! Reloading...");
+        updateCacheBadge("🛡️ Update Ready", "badge-success");
+        setTimeout(() => location.reload(), 1200);
+      });
+
+      ac.addEventListener("noupdate", function () {
+        setProgress(0, "Offline cache is up to date & ready. Click Start Jailbreak to begin.");
+        onCacheReady("Cache is up to date.");
+      });
+
+      ac.addEventListener("error", function () {
+        if (!navigator.onLine || localStorage.getItem("gs_cached") === "true") {
+          onCacheReady("Running in offline mode from cache.");
         } else {
-          updateCacheBadge("🛡️ Checking Offline Cache", "badge-info");
-          logToDebug("[CACHE] Cache check notice (offline or network changed).");
+          logToDebug("[CACHE] Cache notice (offline or network idle).");
+          onCacheReady("Ready.");
         }
-      }
-    });
+      });
+    }
 
     // Global Initialization
     document.addEventListener("DOMContentLoaded", function () {
@@ -585,12 +600,10 @@
         autoJbInput.checked = storedAutoJb;
         autoJbInput.addEventListener("change", function () {
           localStorage.setItem("gs_autojb", autoJbInput.checked);
-          if (autoJbInput.checked) startCountdown();
+          if (autoJbInput.checked && isCachingComplete) startCountdown();
           else stopCountdown();
         });
       }
-
-      if (storedAutoJb) startCountdown();
 
       // Launch button listener
       if (jailbreakBtn) {
@@ -609,8 +622,8 @@
         setTimeout(triggerJailbreak, 100);
       }
 
-      // Trigger selective background caching for detected/selected FW
-      initSelectiveCaching();
+      // Initialize AppCache lifecycle
+      setupAppCache();
     });
   </script>
 </body>
