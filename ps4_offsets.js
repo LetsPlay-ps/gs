@@ -1,4 +1,4 @@
-export const REQUIRED_KEYS = [
+const REQUIRED_KEYS = [
   "fw_status",
   "wk_expm1_builtin",
   "wk_JSFunction_m_function",
@@ -28,7 +28,7 @@ export const REQUIRED_KEYS = [
   "k_sysent_661",
   "k_jmp_rsi",
 ];
-export const OPTIONAL_KEYS = [
+const OPTIONAL_KEYS = [
   "k_stubs",
   "wk___imp_pthread_create",
   "k_pthread_create",
@@ -42,7 +42,7 @@ export const OPTIONAL_KEYS = [
   "k_idt_rsvd",
 ];
 
-export const PS4 = {
+const PS4 = {
   "11.00": {
     fw_status: "state=proven step4q=90/0 reboot=0 kernel_rvas=5/5-vs-dump",
 
@@ -644,10 +644,22 @@ PS4["12.52"] = Object.assign({}, PS4["12.50"], {
   kpatch: "1250.bin",
 });
 
-export function offsetsFor(uaString) {
+function offsetsFor(uaString) {
   const m = (uaString || "").match(/PlayStation\s+4[\/ ](\d+)\.(\d+)/);
   if (!m) return { key: null, off: null };
 
   const key = m[1] + "." + parseInt(m[2], 16).toString(16).padStart(2, "0");
   return { key, off: PS4[key] || null };
+}
+
+globalThis.REQUIRED_KEYS = REQUIRED_KEYS;
+globalThis.OPTIONAL_KEYS = OPTIONAL_KEYS;
+globalThis.PS4 = PS4;
+globalThis.offsetsFor = offsetsFor;
+
+if (typeof window !== "undefined") {
+  window.REQUIRED_KEYS = REQUIRED_KEYS;
+  window.OPTIONAL_KEYS = OPTIONAL_KEYS;
+  window.PS4 = PS4;
+  window.offsetsFor = offsetsFor;
 }

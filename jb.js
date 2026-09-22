@@ -1,7 +1,8 @@
-import { establishPrimitive } from "./core.js?v=10";
-import { installWindowP, pairStatus } from "./mem.js";
-import { int64 } from "./int64.js";
-import { offsetsFor } from "./ps4_offsets.js";
+const establishPrimitive = window.establishPrimitive || globalThis.establishPrimitive;
+const installWindowP = window.installWindowP || globalThis.installWindowP;
+const pairStatus = window.pairStatus || globalThis.pairStatus;
+const int64 = window.int64 || globalThis.int64;
+const offsetsFor = window.offsetsFor || globalThis.offsetsFor;
 
 const outEl = document.getElementById("out");
 const stateEl = document.getElementById("state");

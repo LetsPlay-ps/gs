@@ -3,61 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GAME SHOP • PS4 Exploit Gateway & Smart Router</title>
+  <title>GAME SHOP • PS4 Multi-FW Exploit Host (7.00 - 13.52)</title>
   <link rel="icon" type="image/png" href="icon0.png">
   <link rel="stylesheet" href="style.css">
-
-  <!-- Immediate Auto-Detection Script (Executes before any cache asset download) -->
-  <script>
-    (function () {
-      try {
-        var search = window.location.search || "";
-        var params = new URLSearchParams(search);
-
-        // Allow manual UI view with ?manual=1, ?select=1, ?stay=1 or ?noredirect=1
-        if (params.get("manual") === "1" || params.get("select") === "1" || params.get("stay") === "1" || params.get("noredirect") === "1") {
-          window.__GS_MANUAL_OVERRIDE = true;
-          return;
-        }
-
-        var ua = navigator.userAgent;
-        var m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(ua);
-        if (m) {
-          var major = parseInt(m[1], 10);
-          var minor = parseInt(m[2], 16);
-          var ms = minor.toString(16);
-          if (ms.length < 2) ms = "0" + ms;
-          var fwNum = major * 100 + parseInt(ms, 10);
-
-          // Target 1: FW 13.02 - 13.52 -> Switch to local 13.52 host (loads & caches offline assets)
-          if (fwNum >= 1302 && fwNum <= 1352) {
-            window.location.replace("host1352.html" + search);
-            return;
-          }
-
-          // Target 2: FW 7.00 - 13.00 -> Switch to Game Shop AIO host
-          if (fwNum < 1302) {
-            window.location.replace("https://letsplay-ps.github.io/gs1/" + search);
-            return;
-          }
-        }
-      } catch (err) {}
-    })();
-  </script>
 </head>
 
 <body>
   <div class="main-wrapper">
-    <!-- Header -->
+    <!-- Header: Seamless Title + Status Badges -->
     <header class="header-card">
       <h1 class="brand-title">GAME SHOP</h1>
-      <p class="brand-subtitle">Smart Exploit Gateway • Automated PS4 Firmware Dispatcher</p>
+      <p class="brand-subtitle">PS4 Exploit Suite • All-In-One Unified Host (7.00 – 13.52)</p>
       
       <div class="badges-row">
-        <span class="badge badge-primary" id="systemBadge">🔍 Analyzing System...</span>
-        <span class="badge badge-info" id="routingBadge">⚡ Smart Routing</span>
-        <span class="badge badge-success">🛡️ Zero Cache Overhead</span>
-        <span class="badge badge-secondary">👑 Dual Host Ready</span>
+        <span class="badge badge-primary" id="badgeFw">🎮 Detecting System...</span>
+        <span class="badge badge-info" id="badgeEngine">⚙️ Auto Engine</span>
+        <span class="badge badge-success" id="cacheBadge">🛡️ Checking Cache...</span>
+        <span class="badge badge-secondary">👑 GoldHEN Ready</span>
       </div>
     </header>
 
@@ -66,171 +28,556 @@
       <img src="gameshop_animated.gif" alt="GAME SHOP PS4 Exploit Banner" class="banner-animated-img" id="bannerGraphic">
     </div>
 
-    <!-- Gateway Hub Content -->
-    <div class="gateway-wrapper">
-      <!-- Live Status & Auto-Routing Banner -->
-      <div class="gateway-banner" id="statusBanner">
-        <div class="gateway-banner-text">
-          <span id="bannerIcon">🎮</span>
-          <span id="bannerMessage">Detecting your console firmware version...</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="gateway-banner-badge" id="detectedFwBadge">PS4 FW --.--</span>
-          <button class="gateway-cancel-btn" id="cancelRedirectBtn" style="display:none;" onclick="cancelRedirect()">
-            ✖ Cancel Auto-Redirect
-          </button>
+    <!-- Exploit Controls Bar -->
+    <div class="options-card">
+      <div class="option-group">
+        <span class="option-label-title">⚙️ Exploit Chain:</span>
+        <div class="segmented-control" id="kernel-options">
+          <input type="radio" name="kernel" id="engine-auto" value="auto" checked>
+          <label for="engine-auto">Auto (Smart)</label>
+
+          <input type="radio" name="kernel" id="engine-poops-rthdr" value="poops_rthdr">
+          <label for="engine-poops-rthdr">Poops/RTHDR (13.02-13.52)</label>
+
+          <input type="radio" name="kernel" id="engine-poops" value="poops">
+          <label for="engine-poops">Poops (12.50-13.00)</label>
+
+          <input type="radio" name="kernel" id="engine-lapse" value="lapse">
+          <label for="engine-lapse">Lapse (10.00-12.02)</label>
+
+          <input type="radio" name="kernel" id="engine-psfree" value="psfree">
+          <label for="engine-psfree">PSFree (7.00-9.60)</label>
         </div>
       </div>
 
-      <!-- Two Host Selection Cards -->
-      <div class="gateway-grid">
-        <!-- Card 1: PS4 13.52 Local Host -->
-        <div class="gateway-card card-local">
-          <div>
-            <div class="gateway-card-header">
-              <span class="gateway-card-icon">🚀</span>
-              <span class="gateway-tag tag-cyan">100% Offline Ready</span>
-            </div>
-            <h2 class="gateway-card-title">PS4 FW 13.02 - 13.52</h2>
-            <p class="gateway-card-desc">
-              Dedicated high-performance exploit host for modern PS4 firmwares (13.02 - 13.52). Features Poops / RTHDR kernel exploit and offline GoldHEN injection.
-            </p>
-            <ul class="gateway-features-list">
-              <li><span class="dot dot-cyan"></span> Built-in Full Offline ApplicationCache</li>
-              <li><span class="dot dot-cyan"></span> Poops / RTHDR Kernel Race Engine</li>
-              <li><span class="dot dot-cyan"></span> High-Performance Exploit Pipeline</li>
-              <li><span class="dot dot-cyan"></span> Instant GoldHEN v2 Payload Loader</li>
-            </ul>
-          </div>
-          <a href="host1352.html" class="gateway-btn gateway-btn-cyan" id="btnLocal">
-            <span>⚡ Open 13.52 Host</span>
-            <span>➔</span>
-          </a>
-        </div>
-
-        <!-- Card 2: PS4 7.00 - 13.00 External AIO Host -->
-        <div class="gateway-card card-external">
-          <div>
-            <div class="gateway-card-header">
-              <span class="gateway-card-icon">🌐</span>
-              <span class="gateway-tag tag-purple">Multi-Firmware</span>
-            </div>
-            <h2 class="gateway-card-title">PS4 FW 7.00 – 13.00</h2>
-            <p class="gateway-card-desc">
-              Official Game Shop All-in-One exploit suite covering firmware 7.00 up to 13.00. Supports 9.00, 11.00, PPPwn, WebKit, and essential payloads.
-            </p>
-            <ul class="gateway-features-list">
-              <li><span class="dot dot-purple"></span> Multi-Firmware Auto & Manual Selectors</li>
-              <li><span class="dot dot-purple"></span> GoldHEN for FW 7.00 – 11.00</li>
-              <li><span class="dot dot-purple"></span> PPPwn & WebKit Exploit Support</li>
-              <li><span class="dot dot-purple"></span> Cloud Updated Suite</li>
-            </ul>
-          </div>
-          <a href="https://letsplay-ps.github.io/gs1/" class="gateway-btn gateway-btn-purple" id="btnExternal">
-            <span>🌐 Open Game Shop AIO</span>
-            <span>➔</span>
-          </a>
-        </div>
+      <div class="fw-selector-wrapper">
+        <span class="option-label-title">Target FW:</span>
+        <select id="fwSelect" class="fw-dropdown" onchange="onManualFwChange(this.value)">
+          <option value="auto">Auto Detect</option>
+          <optgroup label="Modern 13.xx Series">
+            <option value="13.52">FW 13.52</option>
+            <option value="13.50">FW 13.50</option>
+            <option value="13.04">FW 13.04</option>
+            <option value="13.02">FW 13.02</option>
+            <option value="13.00">FW 13.00</option>
+          </optgroup>
+          <optgroup label="12.xx Series">
+            <option value="12.52">FW 12.52</option>
+            <option value="12.50">FW 12.50</option>
+            <option value="12.02">FW 12.02</option>
+            <option value="12.00">FW 12.00</option>
+          </optgroup>
+          <optgroup label="11.xx & 10.xx Series">
+            <option value="11.52">FW 11.52</option>
+            <option value="11.50">FW 11.50</option>
+            <option value="11.02">FW 11.02</option>
+            <option value="11.00">FW 11.00</option>
+            <option value="10.71">FW 10.71</option>
+            <option value="10.70">FW 10.70</option>
+            <option value="10.50">FW 10.50</option>
+            <option value="10.01">FW 10.01</option>
+            <option value="10.00">FW 10.00</option>
+          </optgroup>
+          <optgroup label="7.xx – 9.xx Series">
+            <option value="9.60">FW 9.60</option>
+            <option value="9.50">FW 9.50</option>
+            <option value="9.04">FW 9.04</option>
+            <option value="9.03">FW 9.03</option>
+            <option value="9.00">FW 9.00 (Golden)</option>
+            <option value="8.52">FW 8.52</option>
+            <option value="8.50">FW 8.50</option>
+            <option value="8.03">FW 8.03</option>
+            <option value="8.00">FW 8.00</option>
+            <option value="7.55">FW 7.55</option>
+            <option value="7.51">FW 7.51</option>
+            <option value="7.50">FW 7.50</option>
+            <option value="7.02">FW 7.02</option>
+            <option value="7.00">FW 7.00</option>
+          </optgroup>
+        </select>
       </div>
+
+      <div class="toggle-wrapper">
+        <label class="switch" for="autoJbInput">
+          <input type="checkbox" id="autoJbInput">
+          <span class="slider"></span>
+        </label>
+        <span id="autoJbLabel" class="option-label-title">Auto Exploit</span>
+        <span id="countdownBadge" class="countdown-badge" style="display:none;">(5s)</span>
+      </div>
+    </div>
+
+    <!-- Action Launch Button -->
+    <div class="action-container">
+      <button id="jailbreakBtn" class="launch-btn" onclick="triggerJailbreak()">
+        <span>🚀 Start Jailbreak</span>
+      </button>
+    </div>
+
+    <!-- Futuristic Neon Progress Bar -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <div class="progress-status-text" id="progressStatus">
+          <span id="statusIcon">⚡</span>
+          <span id="statusLabel">System initialized & ready. Click Start Jailbreak to begin.</span>
+        </div>
+        <span class="progress-percentage" id="progressPct">0%</span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+
+      <!-- Collapsible Live Debug Console -->
+      <button type="button" class="debug-drawer-toggle" onclick="toggleDebugConsole()">
+        Show / Hide Console Log
+      </button>
+      <div class="debug-console" id="debugConsole"></div>
     </div>
 
     <!-- Footer -->
     <footer>
-      <div><strong>GAME SHOP HOST</strong> • Developed & Maintained by Game Shop Team</div>
+      <div><strong>GAME SHOP HOST (7.00 - 13.52)</strong> • Developed & Maintained by Game Shop Team</div>
     </footer>
   </div>
 
-  <script>
-    let countdownTimer = null;
-    let secondsLeft = 3;
-    let targetRedirectUrl = null;
+  <!-- Telemetry and Hook Elements for Exploit Compatibility -->
+  <div id="out" style="display:none;"></div>
+  <span id="state" style="display:none;"></span>
+  <div id="msg" style="display:none;"></div>
+  <div id="spin" style="display:none;"></div>
+  <div id="console" style="display:none;"></div>
 
-    function cancelRedirect() {
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
+  <script>
+    // System & State Variables
+    let detectedKey = null;
+    let detectedFwNum = null;
+    let selectedFw = "auto";
+    let selectedEngine = localStorage.getItem("gs_engine") || "auto";
+    let timerId = null;
+    let countdownNumber = 5;
+    let exploitTriggered = false;
+    let currentCacheCategory = null;
+
+    // Supported Firmwares map (7.00 to 13.52)
+    const SUPPORTED_FWS = {
+      1352: "poops_rthdr", 1350: "poops_rthdr", 1304: "poops_rthdr", 1302: "poops_rthdr",
+      1300: "poops", 1252: "poops", 1250: "poops",
+      1202: "lapse", 1200: "lapse", 1152: "lapse", 1150: "lapse",
+      1102: "lapse", 1100: "lapse", 1071: "lapse", 1070: "lapse", 1050: "lapse", 1001: "lapse", 1000: "lapse",
+      960: "psfree", 950: "psfree", 904: "psfree", 903: "psfree", 900: "psfree",
+      852: "psfree", 850: "psfree", 803: "psfree", 800: "psfree",
+      755: "psfree", 751: "psfree", 750: "psfree", 702: "psfree", 700: "psfree"
+    };
+
+    // DOM Elements
+    const badgeFw = document.getElementById("badgeFw");
+    const badgeEngine = document.getElementById("badgeEngine");
+    const cacheBadge = document.getElementById("cacheBadge");
+    const fwSelect = document.getElementById("fwSelect");
+    const jailbreakBtn = document.getElementById("jailbreakBtn");
+    const statusLabel = document.getElementById("statusLabel");
+    const progressPct = document.getElementById("progressPct");
+    const progressBar = document.getElementById("progressBar");
+    const debugConsole = document.getElementById("debugConsole");
+    const autoJbInput = document.getElementById("autoJbInput");
+    const autoJbLabel = document.getElementById("autoJbLabel");
+    const countdownBadge = document.getElementById("countdownBadge");
+
+    // Progress Bar Updater
+    function setProgress(percent, message = null) {
+      const p = Math.min(100, Math.max(0, percent));
+      if (progressBar) progressBar.style.width = p + "%";
+      if (progressPct) progressPct.textContent = p + "%";
+      if (message && statusLabel) {
+        statusLabel.textContent = message;
+        logToDebug("[STATUS] " + message);
       }
-      const cancelBtn = document.getElementById("cancelRedirectBtn");
-      if (cancelBtn) cancelBtn.style.display = "none";
-      const bannerMsg = document.getElementById("bannerMessage");
-      if (bannerMsg) bannerMsg.textContent = "Auto-redirect paused. Select your target host below.";
+    }
+    window.setProgress = setProgress;
+
+    // Logging Functions
+    function logToDebug(msg, color = null) {
+      if (!debugConsole) return;
+      const time = new Date().toLocaleTimeString();
+      let styledMsg = msg;
+      if (color) {
+        styledMsg = `<span style="color:${color}">${msg}</span>`;
+      } else if (msg.includes("[+]") || msg.includes("SUCCESS") || msg.includes("complete")) {
+        styledMsg = `<span style="color:#00ff88; font-weight:bold;">✔ ${msg}</span>`;
+      } else if (msg.includes("[-]") || msg.includes("ERROR") || msg.includes("fail")) {
+        styledMsg = `<span style="color:#ff3344; font-weight:bold;">✖ ${msg}</span>`;
+      } else if (msg.includes("[*]") || msg.includes("CACHE") || msg.includes("STAGE")) {
+        styledMsg = `<span style="color:#00f0ff; font-weight:600;">⚡ ${msg}</span>`;
+      }
+      debugConsole.innerHTML += `[${time}] ${styledMsg}\n`;
+      debugConsole.scrollTop = debugConsole.scrollHeight;
     }
 
-    function startAutoRedirect(targetUrl, hostName) {
-      targetRedirectUrl = targetUrl;
-      const cancelBtn = document.getElementById("cancelRedirectBtn");
-      if (cancelBtn) cancelBtn.style.display = "inline-block";
+    window.log = function (msg, color = null) {
+      logToDebug(msg, color);
+    };
 
-      const bannerMsg = document.getElementById("bannerMessage");
-      if (bannerMsg) {
-        bannerMsg.textContent = `Routing to ${hostName} in ${secondsLeft}s...`;
-      }
+    window.formatLog = function (msg) {
+      logToDebug(msg);
+    };
 
-      countdownTimer = setInterval(() => {
-        secondsLeft--;
-        if (bannerMsg) {
-          bannerMsg.textContent = `Routing to ${hostName} in ${secondsLeft}s...`;
+    function toggleDebugConsole() {
+      if (!debugConsole) return;
+      debugConsole.style.display = (debugConsole.style.display === "block") ? "none" : "block";
+    }
+
+    function updateCacheBadge(text, cls = "badge-success") {
+      if (!cacheBadge) return;
+      cacheBadge.textContent = text;
+      cacheBadge.className = "badge " + cls;
+    }
+
+    // Firmware Detection
+    function detectPS4() {
+      const ua = navigator.userAgent;
+      const m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(ua);
+      if (m) {
+        const minor = parseInt(m[2], 16);
+        let ms = minor.toString(16);
+        if (ms.length < 2) ms = "0" + ms;
+        detectedKey = m[1] + "." + ms;
+        detectedFwNum = parseInt(m[1], 10) * 100 + parseInt(ms, 10);
+        const engine = SUPPORTED_FWS[detectedFwNum];
+
+        badgeFw.textContent = `🎮 PS4 FW ${detectedKey} ${engine ? '✓' : ''}`;
+        badgeFw.className = engine ? "badge badge-primary" : "badge badge-warning";
+        logToDebug(`PlayStation 4 detected. Firmware: ${detectedKey} (Num: ${detectedFwNum})`);
+
+        if (SUPPORTED_FWS[detectedFwNum]) {
+          fwSelect.value = detectedKey;
+          selectedFw = detectedKey;
         }
-        if (secondsLeft <= 0) {
-          clearInterval(countdownTimer);
-          window.location.replace(targetRedirectUrl + window.location.search);
+      } else {
+        badgeFw.textContent = `💻 PC Simulation Mode`;
+        badgeFw.className = "badge badge-info";
+        logToDebug("Browser: PC / Testing Mode. Exploit engine simulation active.");
+      }
+      updateEngineBadge();
+    }
+
+    function getEffectiveFwNum() {
+      if (selectedFw !== "auto") {
+        const parts = selectedFw.split(".");
+        return parseInt(parts[0], 10) * 100 + parseInt(parts[1] || "0", 10);
+      }
+      return detectedFwNum || 1352;
+    }
+
+    function getEffectiveFwLabel() {
+      if (selectedFw !== "auto") return selectedFw;
+      return detectedKey || "13.52";
+    }
+
+    // Resolve Active Engine based on Selected or Detected FW
+    function resolveActiveEngine() {
+      if (selectedEngine !== "auto") return selectedEngine;
+      const fwNum = getEffectiveFwNum();
+      if (fwNum >= 1302) return "poops_rthdr";
+      if (fwNum >= 1250) return "poops";
+      if (fwNum >= 1000) return "lapse";
+      if (fwNum >= 600) return "psfree";
+      return "poops_rthdr";
+    }
+
+    function updateEngineBadge() {
+      const eng = resolveActiveEngine();
+      let label = eng.toUpperCase();
+      if (eng === "poops_rthdr") label = "POOPS / RTHDR (13.xx)";
+      else if (eng === "poops") label = "POOPS (12.50-13.00)";
+      else if (eng === "lapse") label = "LAPSE (10.00-12.02)";
+      else if (eng === "psfree") label = "PSFREE (7.00-9.60)";
+      badgeEngine.textContent = `⚙️ Engine: ${label}`;
+    }
+
+    function onManualFwChange(val) {
+      selectedFw = val;
+      logToDebug(`Target firmware set to: ${val}`);
+      updateEngineBadge();
+      initSelectiveCaching();
+    }
+
+    // Countdown / Auto-Jailbreak controls
+    function stopCountdown() {
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      if (countdownBadge) countdownBadge.style.display = "none";
+      if (autoJbLabel) autoJbLabel.textContent = "Auto Exploit";
+    }
+
+    function startCountdown() {
+      stopCountdown();
+      countdownNumber = 5;
+      if (countdownBadge) {
+        countdownBadge.style.display = "inline-block";
+        countdownBadge.textContent = `(${countdownNumber}s)`;
+      }
+      if (autoJbLabel) autoJbLabel.textContent = "Launching in:";
+      timerId = setInterval(() => {
+        countdownNumber--;
+        if (countdownBadge) countdownBadge.textContent = `(${countdownNumber}s)`;
+        if (countdownNumber <= 0) {
+          stopCountdown();
+          triggerJailbreak();
         }
       }, 1000);
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const ua = navigator.userAgent;
-      const systemBadge = document.getElementById("systemBadge");
-      const detectedFwBadge = document.getElementById("detectedFwBadge");
-      const bannerMessage = document.getElementById("bannerMessage");
-      const bannerIcon = document.getElementById("bannerIcon");
-      const routingBadge = document.getElementById("routingBadge");
+    // Exploit Marks & Stages Hooking
+    window.onExploitMark = function (tag, detail, raw) {
+      const line = tag + (detail ? " " + detail : "");
+      logToDebug(`[EXPLOIT] ${line}`);
 
-      const m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(ua);
+      if (tag === "FW") {
+        setProgress(15, `Firmware initialized: ${detail}`);
+      } else if (tag === "PAIR-STATUS" || tag === "PRIMITIVE") {
+        setProgress(25, "Stage 1: Triggering WebKit Userland Exploit...");
+      } else if (tag === "PRIMITIVE-OK") {
+        setProgress(35, "Stage 1: WebKit R/W primitive achieved!");
+      } else if (tag === "BASES" || tag === "STUBS") {
+        setProgress(45, "Stage 2: Resolving WebKit & libkernel gadget anchors...");
+      } else if (tag.startsWith("PR-") || tag === "PIN-SPLIT") {
+        setProgress(60, "Stage 3: Triggering kernel race...");
+      } else if (tag === "KREAD-OK" || tag === "KWRITE-OK" || tag === "KRW-OK" || tag === "JB-SOURCES") {
+        setProgress(75, "Stage 3: Kernel R/W primitive established! Escalating privileges...");
+      } else if (tag === "KPATCH-BLOB") {
+        setProgress(85, `Stage 4: Applying kernel patches (${detail})...`);
+      } else if (tag === "PAYLOAD-BLOB") {
+        setProgress(92, "Stage 4: Injecting GoldHEN payload into kernel...");
+      } else if (tag === "PROOF-SUMMARY-FINAL" || tag === "EXPM1-RESTORED") {
+        setProgress(100, "Jailbreak complete! GoldHEN loaded successfully.");
+        if (jailbreakBtn) {
+          jailbreakBtn.innerHTML = "<span>✔ GoldHEN Active!</span>";
+          jailbreakBtn.style.background = "linear-gradient(135deg, #00ff88 0%, #00f0ff 100%)";
+          jailbreakBtn.style.boxShadow = "0 0 35px rgba(0, 255, 136, 0.8)";
+        }
+      } else if (/FAIL|ERROR|THREW|ABORTED/i.test(tag)) {
+        setProgress(0, `Exploit error: ${tag} (${detail || ""})`);
+        if (jailbreakBtn) {
+          jailbreakBtn.disabled = false;
+          jailbreakBtn.innerHTML = "<span>⚠️ Retry Jailbreak</span>";
+        }
+        exploitTriggered = false;
+      }
+    };
 
-      if (m) {
-        const major = parseInt(m[1], 10);
-        const minor = parseInt(m[2], 16);
-        let ms = minor.toString(16);
-        if (ms.length < 2) ms = "0" + ms;
-        const fwKey = major + "." + ms;
-        const fwNum = major * 100 + parseInt(ms, 10);
+    window.onExploitState = function (t, c) {
+      logToDebug(`[STATE] ${t} (${c || "info"})`);
+    };
 
-        systemBadge.textContent = `🎮 PS4 FW ${fwKey}`;
-        detectedFwBadge.textContent = `PS4 FW ${fwKey}`;
+    window.onExploitFinish = function (ok) {
+      if (ok) {
+        setProgress(100, "GoldHEN is loaded! You may press the PS button to exit.");
+        if (jailbreakBtn) jailbreakBtn.innerHTML = "<span>✔ GoldHEN Active!</span>";
+      }
+    };
 
-        if (fwNum >= 1302 && fwNum <= 1352) {
-          detectedFwBadge.style.color = "#ff5500";
-          detectedFwBadge.style.borderColor = "#ff5500";
-          routingBadge.textContent = "⚡ Target: Local 13.52";
-          bannerIcon.textContent = "🚀";
-          if (!window.__GS_MANUAL_OVERRIDE) {
-            startAutoRedirect("host1352.html", "13.52 Local Host");
-          } else {
-            bannerMessage.textContent = `Detected PS4 FW ${fwKey}. Select target host below:`;
+    // Script Loader Helper
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[data-src="${src}"]`);
+        if (existing) return resolve();
+        const s = document.createElement("script");
+        s.setAttribute("data-src", src);
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = (e) => reject(new Error(`Failed to load ${src}`));
+        document.body.appendChild(s);
+      });
+    }
+
+    async function loadScriptSequence(arr) {
+      for (const src of arr) {
+        await loadScript(src);
+      }
+    }
+
+    // Launch Exploit Sequence in-place (No navigation)
+    async function triggerJailbreak() {
+      if (exploitTriggered || (jailbreakBtn && jailbreakBtn.disabled)) return;
+      exploitTriggered = true;
+      if (jailbreakBtn) {
+        jailbreakBtn.disabled = true;
+        jailbreakBtn.innerHTML = '<span>⚙️ Running Exploit...</span>';
+      }
+      stopCountdown();
+
+      const fwNum = getEffectiveFwNum();
+      const fwLabel = getEffectiveFwLabel();
+      const eng = resolveActiveEngine();
+
+      logToDebug("=================================================");
+      logToDebug(`[START] Target FW: ${fwLabel} | Engine: ${eng.toUpperCase()}`);
+      setProgress(10, `Initializing exploit pipeline for FW ${fwLabel}...`);
+
+      try {
+        if (eng === "poops_rthdr" || (eng === "auto" && fwNum >= 1302)) {
+          logToDebug("[ENGINE] Running Poops / RTHDR Engine (FW 13.02 - 13.52)...");
+          await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "jb.js"]);
+        } else if (eng === "poops" || (eng === "auto" && fwNum >= 1250)) {
+          logToDebug("[ENGINE] Running Poops Engine (FW 12.50 - 13.00)...");
+          await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "chain_poops.js"]);
+          if (typeof window.runPoops === "function") {
+            await window.runPoops();
           }
-        } else if (fwNum < 1302) {
-          detectedFwBadge.style.color = "#fbbf24";
-          detectedFwBadge.style.borderColor = "#fbbf24";
-          routingBadge.textContent = "🌐 Target: Game Shop AIO";
-          bannerIcon.textContent = "🌐";
-          if (!window.__GS_MANUAL_OVERRIDE) {
-            startAutoRedirect("https://letsplay-ps.github.io/gs1/", "Game Shop AIO (7.00 - 13.00)");
-          } else {
-            bannerMessage.textContent = `Detected PS4 FW ${fwKey}. Select target host below:`;
+        } else if (eng === "lapse" || (eng === "auto" && fwNum >= 1000)) {
+          logToDebug("[ENGINE] Running Lapse Engine (FW 10.00 - 12.02)...");
+          await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "chain_lapse.js"]);
+          if (typeof window.runLapse === "function") {
+            await window.runLapse();
+          }
+        } else if (eng === "psfree" || (eng === "auto" && fwNum >= 600)) {
+          logToDebug("[ENGINE] Running PSFree Engine (FW 7.00 - 9.60)...");
+          await loadScriptSequence(["bundle.js"]);
+          if (typeof doJBwithPSFreeLapseExploit === "function") {
+            await doJBwithPSFreeLapseExploit();
           }
         } else {
-          detectedFwBadge.textContent = `FW ${fwKey} (Untested)`;
-          routingBadge.textContent = "⚠️ Untested FW";
-          bannerMessage.textContent = `Console FW ${fwKey} is higher than 13.52. Please select manually:`;
+          logToDebug(`[WARN] Falling back to default Poops / RTHDR engine...`);
+          await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "jb.js"]);
         }
-      } else {
-        systemBadge.textContent = "💻 PC / Testing Mode";
-        detectedFwBadge.textContent = "PC Browser";
-        bannerIcon.textContent = "💻";
-        bannerMessage.textContent = "Operating in PC simulation mode. Choose your target host:";
-        routingBadge.textContent = "⚙️ Manual Mode";
+      } catch (err) {
+        logToDebug(`[ERROR] Exploit halted: ${err && err.message ? err.message : err}`);
+        setProgress(0, `Exploit stopped: ${err && err.message ? err.message : err}`);
+        if (jailbreakBtn) {
+          jailbreakBtn.disabled = false;
+          jailbreakBtn.innerHTML = '<span>⚠️ Retry Jailbreak</span>';
+        }
+        exploitTriggered = false;
       }
+    }
+
+    // Selective Background Offline Caching Manager
+    function getCacheCategory(fwNum) {
+      if (fwNum >= 1302 && fwNum <= 1352) return "1302_1352";
+      if (fwNum >= 1250 && fwNum <= 1300) return "1250_1300";
+      if (fwNum >= 1000 && fwNum <= 1202) return "1000_1202";
+      if (fwNum >= 600 && fwNum <= 960) return "700_960";
+      return "1302_1352";
+    }
+
+    function initSelectiveCaching() {
+      const fwNum = getEffectiveFwNum();
+      const fwLabel = getEffectiveFwLabel();
+      const cat = getCacheCategory(fwNum);
+      currentCacheCategory = cat;
+
+      const cachedKey = localStorage.getItem("gs_cached_cat");
+      if (cachedKey === cat) {
+        updateCacheBadge("🛡️ Offline Ready (FW " + fwLabel + ")", "badge-success");
+        logToDebug(`[CACHE] Firmware ${fwLabel} files are verified in offline cache.`);
+        return;
+      }
+
+      updateCacheBadge("⏳ Caching FW " + fwLabel + "...", "badge-info");
+      logToDebug(`[CACHE] Triggering background caching for FW ${fwLabel} (Category: ${cat})...`);
+
+      let iframe = document.getElementById("cacheLoaderFrame");
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "cacheLoaderFrame";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+      }
+      iframe.src = `cache_loader_${cat}.html?t=` + Date.now();
+    }
+
+    // Cache event handler from hidden iframe
+    window.addEventListener("message", function (event) {
+      if (!event.data || event.data.source !== "gameshop_cache") return;
+      const { type, data } = event.data;
+      const fwLabel = getEffectiveFwLabel();
+
+      if (type === "checking") {
+        logToDebug("[CACHE] Checking firmware manifest...");
+      } else if (type === "downloading") {
+        updateCacheBadge("⏳ Caching Files...", "badge-warning");
+        logToDebug(`[CACHE] Downloading offline files for FW ${fwLabel}...`);
+      } else if (type === "progress") {
+        if (data && data.total) {
+          const pct = Math.round((data.loaded / data.total) * 100);
+          setProgress(pct, `Caching FW ${fwLabel} files: ${data.loaded}/${data.total} (${pct}%)`);
+          updateCacheBadge(`⏳ Caching ${pct}%`, "badge-warning");
+        }
+      } else if (type === "cached" || type === "updateready") {
+        setProgress(100, `FW ${fwLabel} files successfully cached for offline use!`);
+        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
+        logToDebug(`[CACHE] FW ${fwLabel} files successfully stored offline.`);
+        if (currentCacheCategory) {
+          localStorage.setItem("gs_cached_cat", currentCacheCategory);
+        }
+        setTimeout(() => {
+          setProgress(0, "System initialized & ready. Click Start Jailbreak to begin.");
+        }, 2000);
+      } else if (type === "noupdate") {
+        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
+        logToDebug(`[CACHE] FW ${fwLabel} files are up to date.`);
+        if (currentCacheCategory) {
+          localStorage.setItem("gs_cached_cat", currentCacheCategory);
+        }
+      } else if (type === "error") {
+        if (localStorage.getItem("gs_cached_cat") === currentCacheCategory) {
+          updateCacheBadge("🛡️ Offline Ready", "badge-success");
+          logToDebug("[CACHE] Running offline using cached firmware files.");
+        } else {
+          updateCacheBadge("🛡️ Checking Offline Cache", "badge-info");
+          logToDebug("[CACHE] Cache check notice (offline or network changed).");
+        }
+      }
+    });
+
+    // Global Initialization
+    document.addEventListener("DOMContentLoaded", function () {
+      detectPS4();
+
+      // Exploit chain radio buttons
+      const radios = document.querySelectorAll('input[name="kernel"]');
+      radios.forEach(r => {
+        if (r.value === selectedEngine) r.checked = true;
+        r.addEventListener("change", function (e) {
+          selectedEngine = e.target.value;
+          localStorage.setItem("gs_engine", selectedEngine);
+          updateEngineBadge();
+          logToDebug(`Exploit chain manually set to: ${selectedEngine.toUpperCase()}`);
+        });
+      });
+
+      // Auto-Jailbreak checkbox
+      const storedAutoJb = localStorage.getItem("gs_autojb") === "true";
+      if (autoJbInput) {
+        autoJbInput.checked = storedAutoJb;
+        autoJbInput.addEventListener("change", function () {
+          localStorage.setItem("gs_autojb", autoJbInput.checked);
+          if (autoJbInput.checked) startCountdown();
+          else stopCountdown();
+        });
+      }
+
+      if (storedAutoJb) startCountdown();
+
+      // Launch button listener
+      if (jailbreakBtn) {
+        jailbreakBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          triggerJailbreak();
+        });
+      }
+
+      // Check URL params for debug
+      const urlParams = new URLSearchParams(location.search);
+      if (urlParams.get("log") === "1" && debugConsole) {
+        debugConsole.style.display = "block";
+      }
+
+      // Trigger selective background caching for detected/selected FW
+      initSelectiveCaching();
     });
   </script>
 </body>
