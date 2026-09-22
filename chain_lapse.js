@@ -863,26 +863,58 @@ window.runLapse = async function () {
         mark("SPRAY-CANCELLED", "");
 
         state("dry run: everything but the racing delete...", "warn");
-        servAddr.dv.setUint8(0, 16);
-        servAddr.dv.setUint8(1, AF_INET);
-        servAddr.dv.setUint16(2, 0x8d13, true);
-        servAddr.dv.setUint32(4, 0x0100007f, true);
         lingerBuf.dv.setInt32(0, 1, true);
         lingerBuf.dv.setInt32(4, 1, true);
 
-        const server = sc(SYS.socket, AF_INET, SOCK_STREAM, 0).i32;
-        openFds.push(server);
-        optval.dv.setInt32(0, 1, true);
-        sc(SYS.setsockopt, server, SOL_SOCKET, SO_REUSEADDR, optval.addr, 4);
-        const br = sc(SYS.bind, server, servAddr.addr, 16).i32;
+        const SO_REUSEPORT = 0x0200;
+        let server = -1;
+        let br = -1, lr2 = -1;
+        let boundPort = -1;
 
-        optval.dv.setInt32(0, PEER_RCVBUF, true);
-        sc(SYS.setsockopt, server, SOL_SOCKET, SO_RCVBUF, optval.addr, 4);
-        const lr2 = sc(SYS.listen, server, 1).i32;
+        // Try binding loopback server to port 5005, then fallback to candidate ports if busy
+        const candidatePorts = [5005, 5006, 5007, 5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 6005, 7005, 8005, 9005, 15005, 25005, 35005, 45005, 55005];
+        for (let i = 0; i < candidatePorts.length; ++i) {
+            const port = candidatePorts[i];
+            servAddr.u8.fill(0);
+            servAddr.dv.setUint8(0, 16); // sin_len
+            servAddr.dv.setUint8(1, AF_INET); // sin_family
+            servAddr.dv.setUint16(2, port, false); // sin_port (big-endian network order)
+            servAddr.dv.setUint8(4, 127);
+            servAddr.dv.setUint8(5, 0);
+            servAddr.dv.setUint8(6, 0);
+            servAddr.dv.setUint8(7, 1); // 127.0.0.1 (sin_addr)
+
+            server = sc(SYS.socket, AF_INET, SOCK_STREAM, 0).i32;
+            if (server < 0) continue;
+
+            optval.dv.setInt32(0, 1, true);
+            sc(SYS.setsockopt, server, SOL_SOCKET, SO_REUSEADDR, optval.addr, 4);
+            sc(SYS.setsockopt, server, SOL_SOCKET, SO_REUSEPORT, optval.addr, 4);
+
+            br = sc(SYS.bind, server, servAddr.addr, 16).i32;
+            if (br === 0) {
+                optval.dv.setInt32(0, PEER_RCVBUF, true);
+                sc(SYS.setsockopt, server, SOL_SOCKET, SO_RCVBUF, optval.addr, 4);
+                lr2 = sc(SYS.listen, server, 1).i32;
+                if (lr2 === 0) {
+                    boundPort = port;
+                    openFds.push(server);
+                    mark("SERVER-READY", "port=" + boundPort + " fd=" + server);
+                    break;
+                }
+            }
+            sc(SYS.close, server);
+            server = -1;
+        }
+
         check("loopback-server-socket-bound-listening",
             br === 0 && lr2 === 0, "bind=" + br + " listen=" + lr2
-            + " fd=" + server);
-        if (br !== 0 || lr2 !== 0) { state("could not set up the server", "bad"); }
+            + " fd=" + server + " port=" + boundPort);
+        if (br !== 0 || lr2 !== 0) {
+            state("could not set up the server (bind=" + br + " listen=" + lr2 + ")", "bad");
+            mark("PROOF-SUMMARY", "pass=" + passCount + " fail=" + failCount);
+            return;
+        }
 
         const PIPE_SYS = 42, F_SETFL = 4, O_NONBLOCK = 4;
         const FIOSETOWN = 0x8004667c;
