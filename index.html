@@ -385,6 +385,8 @@
         setProgress(100, "GoldHEN is loaded! You may press the PS button to exit.");
         if (jailbreakBtn) jailbreakBtn.innerHTML = "<span>✔ GoldHEN Active!</span>";
       }
+    };
+
     window.onerror = function (msg, url, line, col, err) {
       logToDebug(`[UNCAUGHT] ${msg} at ${url}:${line}:${col}`, "#ff3344");
     };
