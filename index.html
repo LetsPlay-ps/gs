@@ -104,13 +104,17 @@
         </label>
         <span id="autoJbLabel" class="option-label-title">Auto Exploit</span>
         <span id="countdownBadge" class="countdown-badge" style="display:none;">(5s)</span>
+        <button type="button" id="cancelAutoBtn" class="cancel-auto-btn" style="display:none;" onclick="stopCountdown()">Cancel</button>
       </div>
     </div>
 
-    <!-- Action Launch Button -->
+    <!-- Action Launch Button & Offline Cache Controls -->
     <div class="action-container">
       <button id="jailbreakBtn" class="launch-btn" onclick="triggerJailbreak()">
         <span>🚀 Start Jailbreak</span>
+      </button>
+      <button type="button" id="reinstallCacheBtn" class="cache-action-btn" onclick="forceReinstallCache()">
+        <span>📥 Reinstall Offline Cache (100%)</span>
       </button>
     </div>
 
@@ -308,16 +312,21 @@
         timerId = null;
       }
       if (countdownBadge) countdownBadge.style.display = "none";
+      const cancelBtn = document.getElementById("cancelAutoBtn");
+      if (cancelBtn) cancelBtn.style.display = "none";
       if (autoJbLabel) autoJbLabel.textContent = "Auto Exploit";
     }
 
     function startCountdown() {
+      if (!isCachingComplete || exploitTriggered) return;
       stopCountdown();
       countdownNumber = 5;
       if (countdownBadge) {
         countdownBadge.style.display = "inline-block";
         countdownBadge.textContent = `(${countdownNumber}s)`;
       }
+      const cancelBtn = document.getElementById("cancelAutoBtn");
+      if (cancelBtn) cancelBtn.style.display = "inline-block";
       if (autoJbLabel) autoJbLabel.textContent = "Launching in:";
       timerId = setInterval(() => {
         countdownNumber--;
@@ -433,6 +442,7 @@
 
       try {
         window.__selectedFw = fwLabel;
+        window.__noAutoRunJb = true;
         sessionStorage.setItem("lp_target_fw", fwLabel);
 
         if (eng === "poops_rthdr" || (eng === "auto" && fwNum >= 1302)) {
@@ -477,6 +487,33 @@
       }
     }
 
+    // Force Reinstall / Update Offline Cache
+    function forceReinstallCache() {
+      stopCountdown();
+      exploitTriggered = false;
+      isCachingComplete = false;
+      localStorage.removeItem("gs_cached");
+      if (jailbreakBtn) {
+        jailbreakBtn.disabled = true;
+        jailbreakBtn.innerHTML = '<span>⏳ Caching Offline...</span>';
+      }
+      updateCacheBadge("⏳ Updating...", "badge-warning");
+      setProgress(5, "Contacting host to verify and download offline cache (38 files)...");
+      logToDebug("[CACHE] Manual cache reinstall initiated. Updating ApplicationCache...");
+
+      const ac = window.applicationCache;
+      if (ac) {
+        try {
+          ac.update();
+        } catch (err) {
+          logToDebug(`[CACHE] ac.update(): ${err && err.message ? err.message : err}. Reloading...`);
+          setTimeout(() => location.reload(), 600);
+        }
+      } else {
+        location.reload();
+      }
+    }
+
     // Native ApplicationCache Lifecycle Manager (Direct 100% Offline Support)
     let isCachingComplete = false;
 
@@ -494,9 +531,8 @@
           jailbreakBtn.disabled = false;
           jailbreakBtn.innerHTML = '<span>🚀 Start Jailbreak</span>';
         }
-        // Start auto-exploit countdown ONLY after cache is verified/ready
-        const storedAutoJb = localStorage.getItem("gs_autojb") === "true";
-        if (storedAutoJb && !timerId && !exploitTriggered) {
+        // ONLY launch auto-exploit if OFFLINE and explicitly enabled by user
+        if (!navigator.onLine && autoJbInput && autoJbInput.checked && !timerId && !exploitTriggered) {
           startCountdown();
         }
       }
@@ -507,8 +543,10 @@
       }
 
       if (ac.status === ac.IDLE) {
+        setProgress(100, `Offline cache is 100% verified & ready. Disconnect internet and click Start Jailbreak.`);
         onCacheReady(`Firmware ${fwLabel} suite verified in offline cache.`);
       } else if (!navigator.onLine) {
+        setProgress(100, `Operating in 100% Offline Mode. Click Start Jailbreak to begin.`);
         onCacheReady(`Operating offline from local cache.`);
       } else {
         if (jailbreakBtn) {
@@ -522,6 +560,10 @@
       ac.addEventListener("checking", function () {
         logToDebug("[CACHE] Checking offline cache manifest on server...");
         updateCacheBadge("⏳ Checking Cache...", "badge-info");
+        if (jailbreakBtn && !exploitTriggered) {
+          jailbreakBtn.disabled = true;
+          jailbreakBtn.innerHTML = '<span>⏳ Checking Cache...</span>';
+        }
       });
 
       ac.addEventListener("downloading", function () {
@@ -532,7 +574,7 @@
           jailbreakBtn.innerHTML = '<span>⏳ Caching Offline...</span>';
         }
         updateCacheBadge("⏳ Caching Files...", "badge-warning");
-        setProgress(5, `Downloading offline exploit suite for FW ${fwLabel}...`);
+        setProgress(1, `Downloading offline exploit suite for FW ${fwLabel}...`);
         logToDebug(`[CACHE] Downloading offline files into PS4 cache...`);
       });
 
@@ -545,26 +587,29 @@
       });
 
       ac.addEventListener("cached", function () {
+        isCachingComplete = true;
         setProgress(100, "All exploit assets 100% cached offline! You can now disconnect the internet.");
         logToDebug("[CACHE] Host successfully stored in PS4 offline cache.");
         localStorage.setItem("gs_cached", "true");
-        setTimeout(() => {
-          if (!exploitTriggered) {
-            setProgress(0, "System initialized & ready. Click Start Jailbreak to begin.");
-          }
-          onCacheReady("Caching completed successfully.");
-        }, 1500);
+        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
+        if (jailbreakBtn && !exploitTriggered) {
+          jailbreakBtn.disabled = false;
+          jailbreakBtn.innerHTML = '<span>🚀 Start Jailbreak</span>';
+        }
       });
 
       ac.addEventListener("updateready", function () {
         try { ac.swapCache(); } catch (e) {}
-        setProgress(100, "Cache updated with latest version! Reloading...");
+        setProgress(100, "Cache updated with latest version! Reloading in 2s...");
         updateCacheBadge("🛡️ Update Ready", "badge-success");
-        setTimeout(() => location.reload(), 1200);
+        localStorage.setItem("gs_cached", "true");
+        setTimeout(() => location.reload(), 2000);
       });
 
       ac.addEventListener("noupdate", function () {
-        setProgress(0, "Offline cache is up to date & ready. Click Start Jailbreak to begin.");
+        isCachingComplete = true;
+        localStorage.setItem("gs_cached", "true");
+        setProgress(100, "Offline cache is up to date & ready (100%). Disconnect internet and click Start Jailbreak.");
         onCacheReady("Cache is up to date.");
       });
 

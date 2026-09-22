@@ -156,10 +156,11 @@ let allDone = false,
   jailbroken = false,
   kpatched = false,
   payloadRunning = false;
-
-
+let isJbRunning = false;
 
 async function runJb() {
+  if (isJbRunning) return;
+  isJbRunning = true;
   passCount = 0;
   failCount = 0;
   lines.length = 0;
@@ -3418,8 +3419,8 @@ async function runJb() {
 
 window.runJb = runJb;
 
-// Auto-run if not disabled
-if (typeof window !== "undefined" && !window.__noAutoRunJb) {
+// Auto-run only if explicitly requested
+if (typeof window !== "undefined" && window.__autoRunJb === true) {
   runJb();
 }
 
