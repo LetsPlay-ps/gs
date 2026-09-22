@@ -377,18 +377,33 @@
         setProgress(100, "GoldHEN is loaded! You may press the PS button to exit.");
         if (jailbreakBtn) jailbreakBtn.innerHTML = "<span>✔ GoldHEN Active!</span>";
       }
+    window.onerror = function (msg, url, line, col, err) {
+      logToDebug(`[UNCAUGHT] ${msg} at ${url}:${line}:${col}`, "#ff3344");
     };
 
-    // Script Loader Helper
+    window.onunhandledrejection = function (e) {
+      logToDebug(`[PROMISE-REJECT] ${e && e.reason ? (e.reason.message || e.reason) : e}`, "#ff3344");
+    };
+
+    // Script Loader Helper with safety timeout
     function loadScript(src) {
       return new Promise((resolve, reject) => {
         const existing = document.querySelector(`script[data-src="${src}"]`);
         if (existing) return resolve();
         const s = document.createElement("script");
         s.setAttribute("data-src", src);
+        const timer = setTimeout(() => {
+          reject(new Error(`Timed out loading ${src}`));
+        }, 15000);
+        s.onload = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        s.onerror = (e) => {
+          clearTimeout(timer);
+          reject(new Error(`Failed to load ${src}`));
+        };
         s.src = src;
-        s.onload = resolve;
-        s.onerror = (e) => reject(new Error(`Failed to load ${src}`));
         document.body.appendChild(s);
       });
     }
@@ -418,9 +433,15 @@
       setProgress(10, `Initializing exploit pipeline for FW ${fwLabel}...`);
 
       try {
+        window.__selectedFw = fwLabel;
+        sessionStorage.setItem("lp_target_fw", fwLabel);
+
         if (eng === "poops_rthdr" || (eng === "auto" && fwNum >= 1302)) {
           logToDebug("[ENGINE] Running Poops / RTHDR Engine (FW 13.02 - 13.52)...");
           await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "jb.js"]);
+          if (typeof window.runJb === "function") {
+            await window.runJb();
+          }
         } else if (eng === "poops" || (eng === "auto" && fwNum >= 1250)) {
           logToDebug("[ENGINE] Running Poops Engine (FW 12.50 - 13.00)...");
           await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "chain_poops.js"]);
@@ -442,6 +463,9 @@
         } else {
           logToDebug(`[WARN] Falling back to default Poops / RTHDR engine...`);
           await loadScriptSequence(["int64.js", "ps4_offsets.js", "core.js", "mem.js", "jb.js"]);
+          if (typeof window.runJb === "function") {
+            await window.runJb();
+          }
         }
       } catch (err) {
         logToDebug(`[ERROR] Exploit halted: ${err && err.message ? err.message : err}`);
@@ -455,6 +479,8 @@
     }
 
     // Selective Background Offline Caching Manager
+    const GS_CACHE_REV = "20260922-v2";
+
     function getCacheCategory(fwNum) {
       if (fwNum >= 1302 && fwNum <= 1352) return "1302_1352";
       if (fwNum >= 1250 && fwNum <= 1300) return "1250_1300";
@@ -470,8 +496,10 @@
       currentCacheCategory = cat;
 
       const cachedKey = localStorage.getItem("gs_cached_cat");
-      if (cachedKey === cat) {
-        updateCacheBadge("🛡️ Offline Ready (FW " + fwLabel + ")", "badge-success");
+      const cachedRev = localStorage.getItem("gs_cache_rev");
+
+      if (cachedKey === cat && cachedRev === GS_CACHE_REV) {
+        updateCacheBadge("🛡️ 100% Offline Ready", "badge-success");
         logToDebug(`[CACHE] Firmware ${fwLabel} files are verified in offline cache.`);
         return;
       }
@@ -512,6 +540,7 @@
         logToDebug(`[CACHE] FW ${fwLabel} files successfully stored offline.`);
         if (currentCacheCategory) {
           localStorage.setItem("gs_cached_cat", currentCacheCategory);
+          localStorage.setItem("gs_cache_rev", GS_CACHE_REV);
         }
         setTimeout(() => {
           setProgress(0, "System initialized & ready. Click Start Jailbreak to begin.");
@@ -521,6 +550,7 @@
         logToDebug(`[CACHE] FW ${fwLabel} files are up to date.`);
         if (currentCacheCategory) {
           localStorage.setItem("gs_cached_cat", currentCacheCategory);
+          localStorage.setItem("gs_cache_rev", GS_CACHE_REV);
         }
       } else if (type === "error") {
         if (localStorage.getItem("gs_cached_cat") === currentCacheCategory) {
@@ -570,10 +600,13 @@
         });
       }
 
-      // Check URL params for debug
+      // Check URL params for debug and auto-run
       const urlParams = new URLSearchParams(location.search);
       if (urlParams.get("log") === "1" && debugConsole) {
         debugConsole.style.display = "block";
+      }
+      if (urlParams.get("runnow") === "1") {
+        setTimeout(triggerJailbreak, 100);
       }
 
       // Trigger selective background caching for detected/selected FW

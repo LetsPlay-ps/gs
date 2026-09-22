@@ -645,6 +645,9 @@ PS4["12.52"] = Object.assign({}, PS4["12.50"], {
 });
 
 function offsetsFor(uaString) {
+  if (typeof uaString === "string" && PS4[uaString]) {
+    return { key: uaString, off: PS4[uaString] };
+  }
   const m = (uaString || "").match(/PlayStation\s+4[\/ ](\d+)\.(\d+)/);
   if (!m) return { key: null, off: null };
 

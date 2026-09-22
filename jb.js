@@ -1,3 +1,6 @@
+(function () {
+"use strict";
+
 const establishPrimitive = window.establishPrimitive || globalThis.establishPrimitive;
 const installWindowP = window.installWindowP || globalThis.installWindowP;
 const pairStatus = window.pairStatus || globalThis.pairStatus;
@@ -154,13 +157,30 @@ let allDone = false,
   kpatched = false,
   payloadRunning = false;
 
-(async function () {
+
+
+async function runJb() {
+  passCount = 0;
+  failCount = 0;
+  lines.length = 0;
+  allDone = false;
+  jailbroken = false;
+  kpatched = false;
+  payloadRunning = false;
+
+
   let p = null;
 
   const opened = [];
   let closeFd = null;
   try {
-    const { key, off } = offsetsFor(navigator.userAgent);
+    const targetFw = (typeof window !== "undefined" && window.__selectedFw) ||
+                     (typeof sessionStorage !== "undefined" && sessionStorage.getItem("lp_target_fw")) ||
+                     navigator.userAgent;
+    let { key, off } = offsetsFor(targetFw);
+    if (!off && targetFw !== navigator.userAgent) {
+      ({ key, off } = offsetsFor(navigator.userAgent));
+    }
     mark("FW", key || "(not a PS4 UA)");
     if (!off) {
       state("no offsets for this firmware", "bad");
@@ -625,9 +645,22 @@ let allDone = false,
       : 40000000;
     mark("PR-CFG", "nleak=" + N_LEAK + " spray=" + SPRAY + " spin=" + SPIN);
 
+    function createRpcWorker() {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "rpc_worker.js", false);
+        xhr.send();
+        if ((xhr.status === 200 || xhr.status === 0) && xhr.responseText && xhr.responseText.length > 50) {
+          const blob = new Blob([xhr.responseText], { type: "application/javascript" });
+          return new Worker(URL.createObjectURL(blob));
+        }
+      } catch (e) {}
+      return new Worker("rpc_worker.js");
+    }
+
     async function bringWorker(name) {
       const w = { name: name, armed: false, wired: false };
-      w.worker = new Worker("rpc_worker.js");
+      w.worker = createRpcWorker();
       w.rpc = makeRpc(w.worker, name);
       if ((await w.rpc("ping", 15000)) !== "pong")
         throw new Error(name + " ping");
@@ -3380,4 +3413,14 @@ let allDone = false,
       finishUI(payloadRunning);
     } catch (eUI) {}
   }
+
+}
+
+window.runJb = runJb;
+
+// Auto-run if not disabled
+if (typeof window !== "undefined" && !window.__noAutoRunJb) {
+  runJb();
+}
+
 })();
